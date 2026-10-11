@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang='tr'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Alışveriş Listesi</title>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap'>
+<style>
+:root{--page:#FAFAFA;--card:#FFFFFF;--border:#E4E4E7;--fg:#09090B;--muted:#71717A;--muted-bg:#F4F4F5;--primary:#18181B;--primary-fg:#FAFAFA;--thumb:#D4D4D8;--err:#DC2626}
+@media(prefers-color-scheme:dark){:root{--page:#09090B;--card:#111113;--border:#27272A;--fg:#FAFAFA;--muted:#A1A1AA;--muted-bg:#18181B;--primary:#FAFAFA;--primary-fg:#18181B;--thumb:#3F3F46;--err:#F87171}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--page);color:var(--fg);font:14px/1.5 'Geist',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px;background:var(--page);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.logo{width:32px;height:32px;border-radius:8px;background:var(--primary);color:var(--primary-fg);display:flex;align-items:center;justify-content:center}
+.right{display:flex;align-items:center;gap:12px}
+.email{color:var(--muted)}
+.btn{height:40px;padding:0 14px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.btn:disabled{opacity:.5;cursor:default}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:var(--primary-fg)}
+.total{display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;background:var(--primary);color:var(--primary-fg)}
+.total span{font-size:13px;opacity:.7}
+.total strong{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+main{max-width:768px;margin:0 auto;padding:24px 24px 56px;display:flex;flex-direction:column;gap:24px}
+.sub{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.add{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;padding:20px}
+.field{display:flex;flex-direction:column;gap:8px;font-weight:500}
+.f-name{flex:1 1 220px}
+.f-price{flex:0 1 140px}
+input,select{height:40px;padding:0 12px;border:1px solid var(--border);border-radius:8px;background:transparent}
+select{background:var(--card);font-weight:500}
+input{width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.head{padding:20px;display:flex;flex-direction:column;gap:2px}
+.head h3{font-size:16px;font-weight:600}
+.cols{display:flex;justify-content:space-between;align-items:center;height:40px;padding:0 100px 0 20px;background:var(--muted-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:13px;font-weight:500;color:var(--muted)}
+.scroll{overflow-y:scroll;scrollbar-width:thin;scrollbar-color:var(--thumb) transparent}
+.scroll::-webkit-scrollbar{width:10px}
+.scroll::-webkit-scrollbar-thumb{background:var(--thumb);border-radius:8px;border:2px solid var(--card)}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;align-items:center;gap:8px;min-height:52px;padding:0 4px 0 20px;border-bottom:1px solid var(--border)}
+li .n{flex:1;min-width:0;font-weight:500;word-break:break-word}
+li .p{font-weight:500;font-variant-numeric:tabular-nums}
+li.empty{justify-content:center;color:var(--muted);padding:24px;border-bottom:0}
+.acts{display:flex;flex:none}
+.ib{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer}
+.ib:hover{background:var(--muted-bg);color:var(--fg)}
+.ib:disabled{opacity:.5;cursor:default}
+.ib.ok{color:var(--fg)}
+.ei{height:40px;padding:0 10px}
+.ei-name{flex:1;min-width:0;width:auto}
+.ei-price{width:96px;flex:none}
+.pager{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:12px 20px;border-top:1px solid var(--border)}
+.pager .l,.pager .r{display:flex;align-items:center;gap:10px}
+.info{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:4px}
+.msg{color:var(--err)}
+.msg:empty{display:none}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.lcard{width:100%;max-width:400px;padding:32px;display:flex;flex-direction:column;gap:20px}
+.lcard .brand{margin-bottom:4px}
+.lcard h1{font-size:24px;font-weight:600;letter-spacing:-.02em}
+.note{font-size:13px;color:var(--muted)}
+.gbtn{height:48px;display:flex;align-items:center;justify-content:center;gap:12px;border:1px solid #747775;border-radius:4px;background:#FFFFFF;color:#1F1F1F;font-weight:500;cursor:pointer;width:100%}
+.gbtn:disabled{opacity:.6;cursor:default}
+.gicon{width:20px;height:20px;flex:none}
+.gicon svg{display:block}
+@media(max-width:640px){.email{display:none}}
+@media(max-width:520px){.top{padding:12px 16px}.total{padding:0 12px}.total strong{font-size:15px}main{padding:16px 16px 48px}}
+@media(max-width:380px){.total span{display:none}}
+</style>
+</head>
+<body>
+<section class='login' id='login' hidden>
+<div class='card lcard'>
+<div class='brand'><div class='logo'><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx='9' cy='20' r='1.5'></circle><circle cx='18' cy='20' r='1.5'></circle><path d='M2 3h3l2.4 11.2a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 7H6'></path></svg></div><span>Listem</span></div>
+<div><h1>Giriş yap</h1><p class='sub' style='margin-top:6px'>Listeni görmek için Google hesabınla devam et.</p></div>
+<button type='button' class='gbtn' id='loginBtn'>
+<span class='gicon'><svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' aria-hidden='true'>
+<path fill='#EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'></path>
+<path fill='#4285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'></path>
+<path fill='#FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'></path>
+<path fill='#34A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'></path>
+<path fill='none' d='M0 0h48v48H0z'></path>
+</svg></span>
+<span>Google ile devam et</span>
+</button>
+<p class='msg' id='loginMsg' role='alert'></p>
+<p class='note'>Listen yalnızca sana görünür.</p>
+</div>
+</section>
+
+<div id='app' hidden>
+<header class='top'>
+<div class='brand'><div class='logo'><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx='9' cy='20' r='1.5'></circle><circle cx='18' cy='20' r='1.5'></circle><path d='M2 3h3l2.4 11.2a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 7H6'></path></svg></div><span>Listem</span></div>
+<div class='right'>
+<span class='email' id='email'></span>
+<button type='button' class='btn' id='logoutBtn'>Çıkış</button>
+<div class='total'><span>Toplam</span><strong id='total'>0,00 ₺</strong></div>
+</div>
+</header>
+<main>
+<div class='msg' id='msg' role='alert'></div>
+<div class='card add'>
+<label class='field f-name'>Ürün adı<input id='name' placeholder='Örn. Süt 1 L' autocomplete='off' maxlength='200'></label>
+<label class='field f-price'>Fiyat (₺)<input id='price' placeholder='0,00' inputmode='decimal' autocomplete='off'></label>
+<button type='button' class='btn btn-primary' id='addBtn'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M12 5v14M5 12h14'></path></svg>Ekle</button>
+</div>
+<div class='card'>
+<div class='head'><h3>Ürün listesi</h3><p class='sub' id='count'>0 ürün</p></div>
+<div class='cols'><span>Ürün</span><span>Fiyat</span></div>
+<div class='scroll' id='scroll'><ul id='list'></ul></div>
+<div class='pager'>
+<div class='l'><label for='size' class='sub'>Sayfa başına</label><select id='size'><option value='5'>5</option><option value='10'>10</option><option value='20'>20</option><option value='50'>50</option></select></div>
+<div class='r'><span class='info' id='pageInfo'></span>
+<button type='button' class='btn' id='prev'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M15 6l-6 6 6 6'></path></svg>Önceki</button>
+<button type='button' class='btn' id='next'>Sonraki<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M9 6l6 6-6 6'></path></svg></button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+<script src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js'></script>
+<script>
+const sb=supabase.createClient('https://jcjfrbyfcudmhgdijzkf.supabase.co','sb_publishable_80IhijMoGlkJ6-lIef7snw_aK-x3j0I');
+const ROW=52,MAXH=440;
+let items=[],user=null,page=1,size=10,editingId=null,focusEdit=false;
+try{const s=Number(localStorage.getItem('pageSize'));if([5,10,20,50].includes(s))size=s}catch(e){}
+const $=id=>document.getElementById(id);
+const msg=t=>{$('msg').textContent=t||''};
+const svg=d=>`<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>${d}</svg>`;
+const TRASH=svg(`<path d='M3 6h18'></path><path d='M8 6V4h8v2'></path><path d='M6 6l1 14h10l1-14'></path><path d='M10 11v6M14 11v6'></path>`);
+const PENCIL=svg(`<path d='M12 20h9'></path><path d='M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z'></path>`);
+const CHECK=svg(`<path d='M20 6L9 17l-5-5'></path>`);
+const XICON=svg(`<path d='M18 6L6 18M6 6l12 12'></path>`);
+const fmt=n=>Number(n).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₺';
+const fmtInput=n=>Number(n).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2,useGrouping:false});
+const parsePrice=s=>{s=s.split(' ').join('');if(s.includes(','))s=s.split('.').join('').replace(',','.');const v=parseFloat(s);return Number.isFinite(v)&&v>=0?v:NaN};
+function iconBtn(icon,label,fn,cls){const b=document.createElement('button');b.type='button';b.className='ib'+(cls?' '+cls:'');b.setAttribute('aria-label',label);b.innerHTML=icon;b.onclick=fn;return b}
+function updateUI(){
+ $('login').hidden=!!user;$('app').hidden=!user;
+ $('email').textContent=user?user.email:'';
+ $('logoutBtn').title=user?user.email:'';
+}
+async function load(){
+ const {data,error}=await sb.from('items').select('id,name,price').order('id',{ascending:true});
+ if(error){msg('Liste yüklenemedi, sayfayı yenile.');return}
+ items=data;msg('');render();
+}
+function render(){
+ const pages=Math.max(1,Math.ceil(items.length/size));
+ if(page>pages)page=pages;if(page<1)page=1;
+ const start=(page-1)*size,slice=items.slice(start,start+size);
+ $('scroll').style.height=Math.min(size*ROW,MAXH)+'px';
+ const ul=$('list');ul.innerHTML='';
+ if(!items.length){const d=document.createElement('li');d.className='empty';d.textContent='Liste boş';ul.appendChild(d)}
+ slice.forEach(it=>{
+  const li=document.createElement('li');
+  const acts=document.createElement('div');acts.className='acts';
+  if(it.id===editingId){
+   const ni=document.createElement('input');ni.className='ei ei-name';ni.value=it.name;ni.maxLength=200;ni.setAttribute('aria-label','Ürün adı');
+   const pi=document.createElement('input');pi.className='ei ei-price';pi.value=fmtInput(it.price);pi.inputMode='decimal';pi.setAttribute('aria-label','Fiyat');
+   const save=iconBtn(CHECK,'Kaydet',()=>saveEdit(it.id,ni,pi,save),'ok');
+   const cancel=iconBtn(XICON,'Vazgeç',cancelEdit);
+   const onKey=e=>{if(e.key==='Enter')save.click();else if(e.key==='Escape')cancelEdit()};
+   ni.onkeydown=onKey;pi.onkeydown=onKey;
+   acts.append(save,cancel);li.append(ni,pi,acts);
+   if(focusEdit){focusEdit=false;setTimeout(()=>ni.focus(),0)}
+  }else{
+   const n=document.createElement('span');n.className='n';n.textContent=it.name;
+   const p=document.createElement('span');p.className='p';p.textContent=fmt(it.price);
+   const edit=iconBtn(PENCIL,'Düzenle: '+it.name,()=>startEdit(it.id));
+   const del=iconBtn(TRASH,'Sil: '+it.name,()=>remove(it.id,del));
+   acts.append(edit,del);li.append(n,p,acts);
+  }
+  ul.appendChild(li);
+ });
+ $('total').textContent=fmt(items.reduce((s,x)=>s+Number(x.price),0));
+ $('count').textContent=items.length+' ürün';
+ $('size').value=String(size);
+ $('pageInfo').textContent=items.length?(start+1)+'–'+(start+slice.length)+' / '+items.length:'0';
+ $('prev').disabled=page<=1;$('next').disabled=page>=pages;
+}
+function startEdit(id){editingId=id;focusEdit=true;msg('');render()}
+function cancelEdit(){editingId=null;render()}
+async function saveEdit(id,ni,pi,btn){
+ const name=ni.value.trim(),price=parsePrice(pi.value);
+ if(!name){ni.focus();return}
+ if(Number.isNaN(price)){pi.focus();return}
+ btn.disabled=true;
+ const {data,error}=await sb.from('items').update({name,price}).eq('id',id).select('id,name,price').single();
+ if(error){msg('Güncellenemedi, tekrar dene.');btn.disabled=false;return}
+ items=items.map(x=>x.id===id?data:x);editingId=null;msg('');render();
+}
+async function add(){
+ const nameEl=$('name'),priceEl=$('price'),btn=$('addBtn');
+ const name=nameEl.value.trim(),price=parsePrice(priceEl.value);
+ if(!name){nameEl.focus();return}
+ if(Number.isNaN(price)){priceEl.focus();return}
+ btn.disabled=true;
+ const {data,error}=await sb.from('items').insert({name,price}).select('id,name,price').single();
+ if(error){msg('Eklenemedi, tekrar dene.')}
+ else{items.push(data);editingId=null;page=Math.ceil(items.length/size);msg('');render();$('scroll').scrollTop=$('scroll').scrollHeight;nameEl.value='';priceEl.value=''}
+ btn.disabled=false;nameEl.focus();
+}
+async function remove(id,btn){
+ btn.disabled=true;
+ const {error}=await sb.from('items').delete().eq('id',id);
+ if(error){msg('Silinemedi, tekrar dene.');btn.disabled=false;return}
+ if(editingId===id)editingId=null;
+ items=items.filter(x=>x.id!==id);msg('');render();
+}
+$('loginBtn').onclick=async()=>{
+ $('loginMsg').textContent='';
+ const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin}});
+ if(error)$('loginMsg').textContent='Giriş başlatılamadı: '+error.message;
+};
+$('logoutBtn').onclick=()=>sb.auth.signOut();
+$('addBtn').onclick=add;
+$('size').onchange=e=>{size=Number(e.target.value);page=1;editingId=null;try{localStorage.setItem('pageSize',String(size))}catch(_){}render()};
+$('prev').onclick=()=>{page--;editingId=null;render();$('scroll').scrollTop=0};
+$('next').onclick=()=>{page++;editingId=null;render();$('scroll').scrollTop=0};
+['name','price'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')add()}));
+sb.auth.onAuthStateChange((_e,session)=>{
+ user=session?session.user:null;updateUI();
+ if(user){setTimeout(load,0)}else{items=[];page=1;editingId=null;render()}
+});
+render();
+</script>
+</body>
+</html>
