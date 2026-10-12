@@ -14,6 +14,7 @@
 
 ```
 index.html            Tüm arayüz ve mantık (derleme adımı yok)
+assets/               Pixel art favicon (SVG, PNG, Apple touch icon)
 supabase/schema.sql   Tablo, güvenlik politikaları ve yetkiler
 ```
 
