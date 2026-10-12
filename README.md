@@ -8,12 +8,13 @@
 - Sayfa başına 5, 10, 20 veya 50 ürün; seçim tarayıcıda hatırlanır
 - Toplam tutar tüm ürünlerin toplamıdır ve üst çubukta sağda görünür
 - Google ile giriş, kullanıcıya özel liste (Row Level Security)
-- Açık ve koyu tema (işletim sistemi ayarını izler)
+- Renkli, pixel art esintili arayüz; açık ve koyu tema (işletim sistemi ayarını izler)
 
 ## Yapı
 
 ```
 index.html            Tüm arayüz ve mantık (derleme adımı yok)
+assets/               Pixel art favicon (kese + kalp): SVG, ICO, PNG, Apple touch icon
 supabase/schema.sql   Tablo, güvenlik politikaları ve yetkiler
 ```
 
