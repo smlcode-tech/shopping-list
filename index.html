@@ -167,8 +167,12 @@ li.clk:hover{background:var(--muted-bg)}
 </section>
 
 <section id='view-lists' hidden>
+<div class='card add'>
+<label class='field f-name'>Liste adı<input id='listName' placeholder='Örn. Market' autocomplete='off' maxlength='100'></label>
+<button type='button' class='btn btn-primary' id='addListBtn'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M12 5v14M5 12h14'></path></svg>Yeni Liste</button>
+</div>
 <div class='card'>
-<div class='head'><h3>Listelerim</h3><button type='button' class='btn btn-primary' id='addListBtn'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M12 5v14M5 12h14'></path></svg>Yeni Liste</button></div>
+<div class='head'><h3>Listelerim</h3><p class='pill' id='listCount'>0 liste</p></div>
 <div class='scrollAuto'><ul id='listsList'></ul></div>
 </div>
 </section>
@@ -202,6 +206,7 @@ const ROW=52,MAXH=440;
 let sessions=[],lists=[],items=[],user=null;
 let view='sessions',currentSessionId=null,currentListId=null,currentListName='';
 let page=1,size=10,editingId=null,focusEdit=false,justAdded=null;
+let editingSessionId=null,focusEditSession=false,editingListId=null,focusEditList=false;
 try{const s=Number(localStorage.getItem('pageSize'));if([5,10,20,50].includes(s))size=s}catch(e){}
 const $=id=>document.getElementById(id);
 const msg=t=>{$('msg').textContent=t||''};
@@ -245,11 +250,27 @@ async function loadSessions(){
  msg('');renderSessions();
 }
 function sessionRow(s){
- const li=document.createElement('li');li.className='clk';
- const n=document.createElement('span');n.className='n';n.textContent=fmtDate(s.date);
- const p=document.createElement('span');p.className='p';p.textContent=fmt(s.total);
- const c=document.createElement('span');c.className='chev-ic';c.innerHTML=CHEVR;
- li.append(n,p,c);li.onclick=()=>openSession(s.id);
+ const li=document.createElement('li');
+ if(s.id===editingSessionId){
+  const di=document.createElement('input');di.type='date';di.className='ei ei-name';di.value=s.date;di.setAttribute('aria-label','Tarih');
+  const save=iconBtn(CHECK,'Kaydet',()=>saveSessionEdit(s.id,di,save),'ok');
+  const cancel=iconBtn(XICON,'Vazgeç',cancelSessionEdit);
+  const onKey=e=>{if(e.key==='Enter')save.click();else if(e.key==='Escape')cancelSessionEdit()};
+  di.onkeydown=onKey;
+  const acts=document.createElement('div');acts.className='acts';acts.append(save,cancel);
+  li.append(di,acts);
+  if(focusEditSession){focusEditSession=false;setTimeout(()=>di.focus(),0)}
+ }else{
+  li.className='clk';
+  const n=document.createElement('span');n.className='n';n.textContent=fmtDate(s.date);
+  const p=document.createElement('span');p.className='p';p.textContent=fmt(s.total);
+  const acts=document.createElement('div');acts.className='acts';
+  const edit=iconBtn(PENCIL,'Düzenle: '+fmtDate(s.date),e=>{e.stopPropagation();startSessionEdit(s.id)});
+  const del=iconBtn(TRASH,'Sil: '+fmtDate(s.date),e=>{e.stopPropagation();removeSession(s.id,del)});
+  acts.append(edit,del);
+  const c=document.createElement('span');c.className='chev-ic';c.innerHTML=CHEVR;
+  li.append(n,p,acts,c);li.onclick=()=>openSession(s.id);
+ }
  return li;
 }
 function renderSessions(){
@@ -270,37 +291,92 @@ async function addSession(){
  else{dateEl.value='';msg('');await loadSessions()}
  btn.disabled=false;
 }
-function openSession(id){currentSessionId=id;currentListId=null;view='lists';switchView();msg('');loadLists(id)}
+function startSessionEdit(id){editingSessionId=id;focusEditSession=true;msg('');renderSessions()}
+function cancelSessionEdit(){editingSessionId=null;renderSessions()}
+async function saveSessionEdit(id,di,btn){
+ const date=di.value;
+ if(!date){di.focus();return}
+ btn.disabled=true;
+ const {error}=await sb.from('shopping_sessions').update({date}).eq('id',id);
+ if(error){msg('Güncellenemedi, tekrar dene.');btn.disabled=false;return}
+ editingSessionId=null;msg('');await loadSessions();
+}
+async function removeSession(id,btn){
+ if(!window.confirm('Bu alışverişi silersen içindeki tüm listeler ve ürünler de silinir. Emin misin?'))return;
+ btn.disabled=true;
+ const {error}=await sb.from('shopping_sessions').delete().eq('id',id);
+ if(error){msg('Silinemedi, tekrar dene.');btn.disabled=false;return}
+ if(editingSessionId===id)editingSessionId=null;
+ msg('');await loadSessions();
+}
+function openSession(id){currentSessionId=id;currentListId=null;editingListId=null;view='lists';switchView();msg('');loadLists(id)}
 
 /* --- Listelerim (lists) --- */
 async function loadLists(sessionId){
- const {data,error}=await sb.from('lists').select('id,created_at,items(price)').eq('session_id',sessionId).order('created_at',{ascending:true});
+ const {data,error}=await sb.from('lists').select('id,name,items(price)').eq('session_id',sessionId).order('created_at',{ascending:true});
  if(error){msg('Listeler yüklenemedi, sayfayı yenile.');return}
- lists=data.map((l,idx)=>({id:l.id,name:'Listem '+(idx+1),total:l.items.reduce((s,i)=>s+Number(i.price),0)}));
+ lists=data.map(l=>({id:l.id,name:l.name,total:l.items.reduce((s,i)=>s+Number(i.price),0)}));
  msg('');renderLists();
 }
 function listRow(l){
- const li=document.createElement('li');li.className='clk';
- const n=document.createElement('span');n.className='n';n.textContent=l.name;
- const p=document.createElement('span');p.className='p';p.textContent=fmt(l.total);
- const c=document.createElement('span');c.className='chev-ic';c.innerHTML=CHEVR;
- li.append(n,p,c);li.onclick=()=>openList(l.id,l.name);
+ const li=document.createElement('li');
+ if(l.id===editingListId){
+  const ni=document.createElement('input');ni.className='ei ei-name';ni.value=l.name;ni.maxLength=100;ni.setAttribute('aria-label','Liste adı');
+  const save=iconBtn(CHECK,'Kaydet',()=>saveListEdit(l.id,ni,save),'ok');
+  const cancel=iconBtn(XICON,'Vazgeç',cancelListEdit);
+  const onKey=e=>{if(e.key==='Enter')save.click();else if(e.key==='Escape')cancelListEdit()};
+  ni.onkeydown=onKey;
+  const acts=document.createElement('div');acts.className='acts';acts.append(save,cancel);
+  li.append(ni,acts);
+  if(focusEditList){focusEditList=false;setTimeout(()=>ni.focus(),0)}
+ }else{
+  li.className='clk';
+  const n=document.createElement('span');n.className='n';n.textContent=l.name;
+  const p=document.createElement('span');p.className='p';p.textContent=fmt(l.total);
+  const acts=document.createElement('div');acts.className='acts';
+  const edit=iconBtn(PENCIL,'Düzenle: '+l.name,e=>{e.stopPropagation();startListEdit(l.id)});
+  const del=iconBtn(TRASH,'Sil: '+l.name,e=>{e.stopPropagation();removeList(l.id,del)});
+  acts.append(edit,del);
+  const c=document.createElement('span');c.className='chev-ic';c.innerHTML=CHEVR;
+  li.append(n,p,acts,c);li.onclick=()=>openList(l.id,l.name);
+ }
  return li;
 }
 function renderLists(){
  const ul=$('listsList');ul.innerHTML='';
  if(!lists.length)ul.appendChild(emptyRow('Bu alışverişte henüz liste yok, ilk listeni ekle!'));
  else lists.forEach(l=>ul.appendChild(listRow(l)));
+ $('listCount').textContent=lists.length+' liste';
  setTotal(lists.reduce((sum,l)=>sum+l.total,0));
  switchView();
 }
 async function addList(){
- const btn=$('addListBtn');
+ const nameEl=$('listName'),btn=$('addListBtn');
+ const name=nameEl.value.trim();
+ if(!name){nameEl.focus();return}
  btn.disabled=true;
- const {error}=await sb.from('lists').insert({session_id:currentSessionId});
+ const {error}=await sb.from('lists').insert({session_id:currentSessionId,name});
  if(error)msg('Eklenemedi, tekrar dene.');
- else{msg('');await loadLists(currentSessionId)}
- btn.disabled=false;
+ else{nameEl.value='';msg('');await loadLists(currentSessionId)}
+ btn.disabled=false;nameEl.focus();
+}
+function startListEdit(id){editingListId=id;focusEditList=true;msg('');renderLists()}
+function cancelListEdit(){editingListId=null;renderLists()}
+async function saveListEdit(id,ni,btn){
+ const name=ni.value.trim();
+ if(!name){ni.focus();return}
+ btn.disabled=true;
+ const {error}=await sb.from('lists').update({name}).eq('id',id);
+ if(error){msg('Güncellenemedi, tekrar dene.');btn.disabled=false;return}
+ editingListId=null;msg('');await loadLists(currentSessionId);
+}
+async function removeList(id,btn){
+ if(!window.confirm('Bu listeyi silersen içindeki tüm ürünler de silinir. Emin misin?'))return;
+ btn.disabled=true;
+ const {error}=await sb.from('lists').delete().eq('id',id);
+ if(error){msg('Silinemedi, tekrar dene.');btn.disabled=false;return}
+ if(editingListId===id)editingListId=null;
+ msg('');await loadLists(currentSessionId);
 }
 function openList(id,name){currentListId=id;currentListName=name;view='items';page=1;editingId=null;switchView();msg('');loadItems(id)}
 
@@ -379,7 +455,7 @@ async function remove(id,btn){
 /* --- Gezinme --- */
 function goBack(){
  if(view==='items'){view='lists';currentListId=null;currentListName='';editingId=null;switchView();msg('');loadLists(currentSessionId)}
- else if(view==='lists'){view='sessions';currentSessionId=null;switchView();msg('');loadSessions()}
+ else if(view==='lists'){view='sessions';currentSessionId=null;editingListId=null;switchView();msg('');loadSessions()}
 }
 
 $('loginBtn').onclick=async()=>{
@@ -397,13 +473,17 @@ $('prev').onclick=()=>{page--;editingId=null;renderItems();$('scroll').scrollTop
 $('next').onclick=()=>{page++;editingId=null;renderItems();$('scroll').scrollTop=0};
 ['name','price'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')add()}));
 $('sessionDate').addEventListener('keydown',e=>{if(e.key==='Enter')addSession()});
+$('listName').addEventListener('keydown',e=>{if(e.key==='Enter')addList()});
 sb.auth.onAuthStateChange((_e,session)=>{
  user=session?session.user:null;updateUI();
  if(user){
   view='sessions';currentSessionId=null;currentListId=null;currentListName='';
+  editingSessionId=null;editingListId=null;editingId=null;
   switchView();setTimeout(loadSessions,0);
  }else{
-  sessions=[];lists=[];items=[];view='sessions';switchView();renderSessions();
+  sessions=[];lists=[];items=[];view='sessions';
+  editingSessionId=null;editingListId=null;editingId=null;
+  switchView();renderSessions();
  }
 });
 switchView();
