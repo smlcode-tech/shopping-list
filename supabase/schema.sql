@@ -1,6 +1,6 @@
 -- Alışveriş listesi: veritabanı şeması (Supabase / PostgreSQL)
 -- Supabase panelinde SQL Editor'e yapıştırıp bir kez çalıştır.
--- Üç seviyeli hiyerarşi: shopping_sessions (tarih bazlı alışveriş) > lists (Listem 1, 2, ...) > items (ürün + fiyat)
+-- Üç seviyeli hiyerarşi: shopping_sessions (tarih bazlı alışveriş) > lists (kullanıcının adlandırdığı liste) > items (ürün + fiyat)
 
 drop table if exists public.items cascade;
 
@@ -14,6 +14,7 @@ create table public.shopping_sessions (
 create table public.lists (
   id bigint generated always as identity primary key,
   session_id bigint not null references public.shopping_sessions(id) on delete cascade,
+  name text not null check (char_length(name) between 1 and 100),
   created_at timestamptz not null default now()
 );
 
