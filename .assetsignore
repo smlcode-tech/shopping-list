@@ -9,3 +9,5 @@ node_modules
 wrangler.jsonc
 README.md
 supabase
+# iOS uygulamasının kaynak kodu; siteyle ilgisi yok ve yüklenirse herkese açık statik dosya olur.
+mobile
