@@ -4,9 +4,10 @@
 // bu dosya veriyle ilgili hiçbir şeyi değiştirmez.
 // Vercel'den taşındı: Workers Builds bu depoya bağlandığında her push'ta otomatik dağıtır.
 {
-  // Workers Builds, panelde oluşturulan Worker adının bu alanla birebir aynı olmasını şart koşar;
-  // adres de buradan türer: alisveris-listesi.<hesap-alt-alanı>.workers.dev
-  "name": "alisveris-listesi",
+  // Cloudflare panelindeki Worker adıyla birebir aynı olmalı; farklı olursa yerelden
+  // "wrangler deploy" canlı siteyi değil, yeni ve boş bir Worker'ı günceller.
+  // Canlı adres: https://shopping-list.samillyildirimm-13e.workers.dev
+  "name": "shopping-list",
   "compatibility_date": "2026-10-01",
   "assets": {
     // Depo kökü yayınlanır çünkü index.html ve assets/ kökte duruyor; yayına çıkmaması
