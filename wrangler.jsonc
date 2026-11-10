@@ -5,12 +5,18 @@
 // Vercel'den taşındı: Workers Builds bu depoya bağlandığında her push'ta otomatik dağıtır.
 {
   // Workers Builds, panelde oluşturulan Worker adının bu alanla birebir aynı olmasını şart koşar;
-  // adres de buradan türer: alisveris-listesi.<hesap-alt-alanı>.workers.dev
+  // adres de buradan türer: shopping-list.<hesap-alt-alanı>.workers.dev
+  // Paneldeki Worker "shopping-list" adıyla bağlandığı için ad ona eşitlendi; farklı olunca
+  // Workers Builds her derlemede uyarı verip düzeltme PR'ı açıyordu.
   "name": "shopping-list",
   "compatibility_date": "2026-10-01",
   "assets": {
     // Depo kökü yayınlanır çünkü index.html ve assets/ kökte duruyor; yayına çıkmaması
     // gerekenler .assetsignore ile dışlanır.
     "directory": "."
-  }
+  },
+  // PR dallarındaki derlemeler panelde "npx wrangler preview" çalıştırır; bu komut yapılandırmada
+  // bir previews bloğu ister, yoksa hata verip durur. Bağlama (binding) olmadığından boş kalır:
+  // önizleme, canlı siteye dokunmadan aynı statik dosyaları ayrı bir adreste sunar.
+  "previews": {}
 }
