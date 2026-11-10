@@ -28,8 +28,8 @@ mobile/               iOS uygulaması (Expo + React Native); aynı Supabase proj
 3. Supabase → Authentication → Providers → Google: Client ID ve Secret'ı gir, sağlayıcıyı aç.
 4. Supabase → Authentication → URL Configuration: sitenin adresini Site URL ve Redirect URLs listesine ekle.
 5. `index.html` içindeki `createClient(...)` satırına kendi proje adresini ve publishable anahtarını yaz.
-6. Cloudflare → Workers & Pages → Create → Import a repository: bu depoyu seç. Proje adı `wrangler.jsonc` içindeki `name` ile aynı olmalı (`alisveris-listesi`). Derleme komutu boş, deploy komutu `npx wrangler deploy`.
-7. Çıkan `https://alisveris-listesi.<hesap>.workers.dev` adresini 4. adımdaki Redirect URLs listesine ekle. Eklenmezse Google girişi seni Site URL'e geri gönderir.
+6. Cloudflare → Workers & Pages → Create → Import a repository: bu depoyu seç. Proje adı `wrangler.jsonc` içindeki `name` ile aynı olmalı (`shopping-list`). Derleme komutu boş, deploy komutu `npx wrangler deploy`.
+7. Çıkan `https://shopping-list.<hesap>.workers.dev` adresini 4. adımdaki Redirect URLs listesine ekle. Eklenmezse Google girişi seni Site URL'e geri gönderir.
 
 Yerelde denemek için: `npx wrangler dev` (http://localhost:8787).
 

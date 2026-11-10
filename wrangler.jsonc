@@ -5,8 +5,10 @@
 // Vercel'den taşındı: Workers Builds bu depoya bağlandığında her push'ta otomatik dağıtır.
 {
   // Workers Builds, panelde oluşturulan Worker adının bu alanla birebir aynı olmasını şart koşar;
-  // adres de buradan türer: alisveris-listesi.<hesap-alt-alanı>.workers.dev
-  "name": "alisveris-listesi",
+  // adres de buradan türer: shopping-list.<hesap-alt-alanı>.workers.dev
+  // Paneldeki Worker "shopping-list" adıyla bağlandığı için ad ona eşitlendi; farklı olunca
+  // Workers Builds derlemeye başlamadan hata veriyordu.
+  "name": "shopping-list",
   "compatibility_date": "2026-10-01",
   "assets": {
     // Depo kökü yayınlanır çünkü index.html ve assets/ kökte duruyor; yayına çıkmaması
