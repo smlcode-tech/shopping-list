@@ -16,6 +16,8 @@
 index.html            Tüm arayüz ve mantık (derleme adımı yok)
 assets/               Pixel art favicon (kese + kalp): SVG, ICO, PNG, Apple touch icon
 supabase/schema.sql   Tablo, güvenlik politikaları ve yetkiler
+wrangler.jsonc        Cloudflare Workers dağıtım ayarı (yalnızca statik dosyalar)
+.assetsignore         Cloudflare'e yüklenmeyecek dosyalar (README, supabase/, .git ...)
 ```
 
 ## Kurulum
@@ -25,7 +27,14 @@ supabase/schema.sql   Tablo, güvenlik politikaları ve yetkiler
 3. Supabase → Authentication → Providers → Google: Client ID ve Secret'ı gir, sağlayıcıyı aç.
 4. Supabase → Authentication → URL Configuration: sitenin adresini Site URL ve Redirect URLs listesine ekle.
 5. `index.html` içindeki `createClient(...)` satırına kendi proje adresini ve publishable anahtarını yaz.
-6. Vercel'de bu depoyu içe aktar. Framework: Other, derleme komutu ve çıktı klasörü boş.
+6. Cloudflare → Workers & Pages → Create → Import a repository: bu depoyu seç. Proje adı `wrangler.jsonc` içindeki `name` ile aynı olmalı (`alisveris-listesi`). Derleme komutu boş, deploy komutu `npx wrangler deploy`.
+7. Çıkan `https://alisveris-listesi.<hesap>.workers.dev` adresini 4. adımdaki Redirect URLs listesine ekle. Eklenmezse Google girişi seni Site URL'e geri gönderir.
+
+Yerelde denemek için: `npx wrangler dev` (http://localhost:8787).
+
+## Barındırma ve veri
+
+Site Cloudflare Workers'ta statik dosya olarak sunulur (önceden Vercel'deydi). Tüm veri ve kullanıcılar Supabase'dedir; barındırma sağlayıcısını değiştirmek veriye dokunmaz.
 
 ## Güvenlik notu
 

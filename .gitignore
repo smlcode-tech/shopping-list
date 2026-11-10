@@ -1,0 +1,3 @@
+# Yerel wrangler çalıştırmalarının ürettiği önbellek; depoya girmemeli.
+.wrangler/
+node_modules/
