@@ -7,7 +7,7 @@
   // Workers Builds, panelde oluşturulan Worker adının bu alanla birebir aynı olmasını şart koşar;
   // adres de buradan türer: shopping-list.<hesap-alt-alanı>.workers.dev
   // Paneldeki Worker "shopping-list" adıyla bağlandığı için ad ona eşitlendi; farklı olunca
-  // Workers Builds derlemeye başlamadan hata veriyordu.
+  // Workers Builds her derlemede uyarı verip düzeltme PR'ı açıyordu.
   "name": "shopping-list",
   "compatibility_date": "2026-10-01",
   "assets": {
