@@ -6,7 +6,7 @@
 {
   // Workers Builds, panelde oluşturulan Worker adının bu alanla birebir aynı olmasını şart koşar;
   // adres de buradan türer: alisveris-listesi.<hesap-alt-alanı>.workers.dev
-  "name": "alisveris-listesi",
+  "name": "shopping-list",
   "compatibility_date": "2026-10-01",
   "assets": {
     // Depo kökü yayınlanır çünkü index.html ve assets/ kökte duruyor; yayına çıkmaması
