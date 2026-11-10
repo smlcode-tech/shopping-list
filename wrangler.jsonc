@@ -14,5 +14,9 @@
     // Depo kökü yayınlanır çünkü index.html ve assets/ kökte duruyor; yayına çıkmaması
     // gerekenler .assetsignore ile dışlanır.
     "directory": "."
-  }
+  },
+  // PR dallarındaki derlemeler panelde "npx wrangler preview" çalıştırır; bu komut yapılandırmada
+  // bir previews bloğu ister, yoksa hata verip durur. Bağlama (binding) olmadığından boş kalır:
+  // önizleme, canlı siteye dokunmadan aynı statik dosyaları ayrı bir adreste sunar.
+  "previews": {}
 }
