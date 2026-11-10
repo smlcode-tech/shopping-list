@@ -1,0 +1,11 @@
+# Cloudflare'e yüklenmeyecek dosyalar (wrangler.jsonc'deki assets.directory "." olduğu için gerekli).
+# Sitenin çalışması için yalnızca index.html ve assets/ gerekir; geri kalanı depo içi belgedir.
+.git
+.github
+.assetsignore
+.gitignore
+node_modules
+.wrangler
+wrangler.jsonc
+README.md
+supabase
